@@ -1,0 +1,7 @@
+import speedtest
+speed_test = speedtest.Speedtest()
+while True:
+    print('downloading...')
+    download_speed = speed_test.download()
+    print('uploading...')
+    upload_speed = speed_test.upload()
