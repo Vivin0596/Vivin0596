@@ -1,0 +1,45 @@
+import time
+import psutil
+import os
+
+last_received = psutil.net_io_counters().bytes_recv
+last_sent = psutil.net_io_counters().bytes_sent
+last_total = last_received + last_sent
+total_gb = 0
+tal_per_min = 0
+count = 1
+start_time = time.time()
+ini_time = time.strftime("%I:%M %p")
+print(ini_time)
+while True:
+    bytes_received = psutil.net_io_counters().bytes_recv
+    bytes_sent = psutil.net_io_counters().bytes_sent
+    bytes_total = bytes_received + bytes_sent
+
+    new_received = bytes_received - last_received
+    new_sent = bytes_sent - last_sent
+    new_total = bytes_total - last_total
+
+    mb_new_received = new_received / 1024 / 1024
+    mb_new_sent = new_sent / 1024 / 1024
+    mb_new_total = new_total / 1024 / 1024
+
+    total_gb += mb_new_total
+
+    print(count, f": {mb_new_received:.2f} MB ↓ : {mb_new_sent:.2f} MB ↑ : {(mb_new_received + mb_new_sent):.2f} MB per sec : {total_gb/1024:.2f} GB")
+
+    last_received = bytes_received
+    last_sent = bytes_sent
+    last_total = bytes_total
+
+    time.sleep(1)
+    end_time = time.time()
+    overall_time = (end_time - start_time) / 60
+
+    if count == 60:
+        print(f"{tal_per_min:.2f} MB per minute : {total_gb/1024:.2f} GB in {overall_time:.2f} minutes : Started by {ini_time}")
+        count = 1
+        tal_per_min = 0
+    else:
+        count += 1
+        tal_per_min += (mb_new_received + mb_new_sent)
