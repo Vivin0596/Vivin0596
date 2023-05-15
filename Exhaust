@@ -1,0 +1,59 @@
+import time
+import psutil
+import speedtest
+from colorama import Fore, init
+
+init(autoreset=True)
+
+start_time = time.time()
+elapsed_time_iter = 0
+threshold = 60000
+
+print(Fore.YELLOW + f"\t\t\t Data Consumption Started  Threshold : {threshold}")
+print(Fore.LIGHTBLUE_EX + "="*80)
+
+overall_consumption = 0
+count = 1
+
+last_received = psutil.net_io_counters().bytes_recv
+last_sent = psutil.net_io_counters().bytes_sent
+last_total = last_received + last_sent
+
+while overall_consumption <= threshold:
+
+    start_iter_time = time.time()
+
+    st = speedtest.Speedtest()
+    print(Fore.GREEN + f"{count} : downloading & uploading data")
+    st.download()
+    st.upload()
+
+    end_iter_time = time.time()
+    elapsed_time = (end_iter_time - start_iter_time) / 60
+    elapsed_time_iter += elapsed_time
+
+    bytes_received = psutil.net_io_counters().bytes_recv
+    bytes_sent = psutil.net_io_counters().bytes_sent
+    bytes_total = bytes_received + bytes_sent
+
+    new_received = bytes_received - last_received
+    new_sent = bytes_sent - last_sent
+    new_total = bytes_total - last_total
+
+    mb_new_received = new_received / 1024 / 1024
+    mb_new_sent = new_sent / 1024 / 1024
+    mb_new_total = new_total / 1024 / 1024
+
+    last_received = bytes_received
+    last_sent = bytes_sent
+    last_total = bytes_total
+
+    overall_consumption += mb_new_total
+    count += 1
+
+    print(Fore.CYAN + f"\t{mb_new_received:.2f} ↓ MB received, {mb_new_sent:.2f} ↑ MB sent, {mb_new_total:.2f} MB total in {elapsed_time:.2f} secs, {(overall_consumption)/1024:.2f} GB Data Consumed in {elapsed_time_iter:.2f} Mins")
+
+end_time = time.time()
+overall_time = (end_time-start_time)/60
+
+print(Fore.LIGHTGREEN_EX + f"{(overall_consumption/1024):.2f} GB of Data Consumed with in, {overall_time:.2f} mins")
