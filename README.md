@@ -1,6 +1,5 @@
 - 👋 Hi, I’m @Vivin0596
-- 👀 I’m interested in Python
-- 🌱 I’m currently learning Python Django
+- 👀 I’m interested in Data Science
 - 💞️ I’m looking to collaborate on ...
 - 📫 How to reach me ...
 
